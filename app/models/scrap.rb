@@ -52,4 +52,29 @@ class Scrap
     end
   end
 
+
+  def self.cnf
+    @cnf_url = []
+    i=2
+    page = 20
+    link = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=102")
+    @cnf_url << {links: link}
+    begin
+      links = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=102&page=#{i}")
+      i +=1
+      @cnf_url << {links: links}
+    end until i > page
+    @cnf_url.each do |key, value|
+      url = key[:links].to_s
+      page = Nokogiri::HTML(open("#{url}"))
+      company = page.css('#main-wrapper .title')
+      address = page.css('#r1+ td')
+      city = page.css('#r2+ td')
+      country = page.css('#r3+ td')
+      telephone = page.css('#r4+ td')
+      fax = page.css('#r5+ td')
+    end
+  end
+
 end
+
