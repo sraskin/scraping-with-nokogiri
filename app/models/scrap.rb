@@ -124,5 +124,130 @@ class Scrap
     puts agents_identification_number
   end
 
+  def self.cnf
+    @cnf_url = []
+    i=2
+    page = 20
+    link = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=102")
+    @cnf_url << {links: link}
+    begin
+      links = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=102&page=#{i}")
+      i +=1
+      @cnf_url << {links: links}
+    end until i > page
+    @cnf_url.each do |key, value|
+      url = key[:links].to_s
+      page = Nokogiri::HTML(open("#{url}"))
+      company = page.css('#main-wrapper .title').text
+      address = page.css('#r1+ td').text
+      city = page.css('#r2+ td').text
+      country = page.css('#r3+ td').text
+      telephone = page.css('#r4+ td').text
+      fax = page.css('#r5+ td').text
+      description = page.css('#r6+ td').text
+    end
+  end
+
+  def self.exporter_importer
+    @exporter_url = []
+    i=2
+    page = 97
+    link = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=107")
+    @exporter_url << {links: link}
+    begin
+      links = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=107&page=#{i}")
+      i +=1
+      @exporter_url << {links: links}
+    end until i > page
+    comp = []
+    @exporter_url.each do |key, value|
+      url = key[:links].to_s
+      page = Nokogiri::HTML(open("#{url}"))
+      company = page.css('#main-wrapper .title').text
+      address = page.css('#r1+ td').text
+      city = page.css('#r2+ td').text
+      country = page.css('#r3+ td').text
+      telephone = page.css('#r4+ td').text
+      fax = page.css('#r5+ td').text
+      description = page.css('#r6+ td').text
+      comp << company
+      comp.each do |c|
+        puts "#{c}\n"
+      end
+    end
+  end
+
+  def self.ctg_cnf
+    @ctg_url = []
+    i=2
+    page = 147
+    link = ("http://chc.gov.bd/imp/cnf_agents.php")
+    @ctg_url << {links: link}
+    begin
+      links = ("http://chc.gov.bd/imp/cnf_agents.php?&page=#{i}")
+      i +=1
+      @ctg_url << {links: links}
+    end until i > page
+    @ctg_url.each do |key, value|
+      url = key[:links].to_s
+      page = Nokogiri::HTML(open("#{url}"))
+      agents_identification_number = page.css('#inner_page_full_desc td:nth-child(2)').text
+      puts agents_identification_number
+    end
+  end
+
+  def self.test
+    page = Nokogiri::HTML(open("http://chc.gov.bd/imp/cnf_agents.php"))
+    i = 2
+    s = 14
+    id = []
+    begin
+      agents_identification_number = page.css("#inner_page_full_desc tr:nth-child(#{i}) td:nth-child(1)").text
+      i +=1
+      id << agents_identification_number
+    end until i > s
+    id.each do |ii|
+      puts ii
+    end
+  end
+
+  def self.test_2
+    page = Nokogiri::HTML(open("http://chc.gov.bd/imp/cnf_agents.php"))
+    agents_identification_number = page.css("tr:nth-child(2) td:nth-child(5)").text
+    puts agents_identification_number
+  end
+  def self.test_3
+    agent_ids = []
+    license_nos = []
+    names = []
+    addresses = []
+    telephones = []
+    cell_phones = []
+    faxes = []
+    emails = []
+    page = Nokogiri::HTML(open("http://chc.gov.bd/imp/cnf_agents.php"))
+    rows = page.css('tr[height="17"]')
+    rows.each do |row|
+      agent_id = row.css('td')[0].text
+      license_no = row.css('td')[1].text
+      name = row.css('td')[2].text
+      address = row.css('td')[3].text
+      contact_block = row.css('td')[4]
+      telephone = contact_block.css("br")[0].text
+      cell_no = contact_block.css("br")[1].text
+      fax = contact_block.css("br")[2].text
+      email = contact_block.css("br")[3].text
+
+      agent_ids << agent_id
+      license_nos << license_no
+      names << name
+      addresses << address
+      telephones << telephone
+      cell_phones << cell_no
+      faxes << fax
+      emails << email
+    end
+  end
+
 end
 
