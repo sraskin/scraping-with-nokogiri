@@ -47,3 +47,4 @@ group :development do
 end
 
 gem 'rest-client', '~> 1.8'
+gem 'to_xls-rails'

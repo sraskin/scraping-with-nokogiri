@@ -67,13 +67,61 @@ class Scrap
     @cnf_url.each do |key, value|
       url = key[:links].to_s
       page = Nokogiri::HTML(open("#{url}"))
-      company = page.css('#main-wrapper .title')
-      address = page.css('#r1+ td')
-      city = page.css('#r2+ td')
-      country = page.css('#r3+ td')
-      telephone = page.css('#r4+ td')
-      fax = page.css('#r5+ td')
+      company = page.css('#main-wrapper .title').text
+      address = page.css('#r1+ td').text
+      city = page.css('#r2+ td').text
+      country = page.css('#r3+ td').text
+      telephone = page.css('#r4+ td').text
+      fax = page.css('#r5+ td').text
+      puts address "#{'\n'}"
     end
+  end
+
+  def self.test
+    agent_ids = []
+    license_nos = []
+    names = []
+    addresses = []
+    telephones = []
+    cell_phones = []
+    faxes = []
+    emails = []
+    147.times do |n|
+      page = Nokogiri::HTML(open("http://chc.gov.bd/imp/cnf_agents.php?&page=#{n+1}"))
+      rows = page.css('tr[height="17"]')
+      rows.each do |row|
+        agent_id = row.css('td')[0].text
+        license_no = row.css('td')[1].text
+        name = row.css('td')[2].text
+        address = row.css('td')[3].text
+        row.search('br').each {|n| n.replace("#")}
+        contact_block = row.css('td')[4].text
+        telephone = contact_block.split('#')[0].gsub('Telephone: ', '').strip rescue nil
+        cell_no = contact_block.split('#')[1].gsub('Cell No.: ', '').strip rescue nil
+        fax = contact_block.split('#')[2].gsub('Fax: ', '').strip rescue nil
+        email = contact_block.split('#')[3].gsub('Email: ', '').strip rescue nil
+
+        agent_ids << agent_id
+        license_nos << license_no
+        names << name
+        addresses << address
+        telephones << telephone
+        cell_phones << cell_no
+        faxes << fax
+        emails << email
+        puts "======#{n} #{name}======"
+      end
+    end
+    agent_ids.count.times do |n|
+      a = Agent.create(name: names[n], address: addresses[n], phone: telephones[n], mobile: cell_phones[n], fax: faxes[n], email: emails[n], license_no: license_nos[n])
+      puts "#{n} #{a.name}"
+    end
+  end
+
+  def self.test_2
+    page = Nokogiri::HTML(open("http://chc.gov.bd/imp/cnf_agents.php"))
+    agents_identification_number = page.css('#inner_page_full_desc td:nth-child(2)').text
+    puts agents_identification_number
   end
 
 end
