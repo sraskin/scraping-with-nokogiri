@@ -53,31 +53,8 @@ class Scrap
   end
 
 
-  def self.cnf
-    @cnf_url = []
-    i=2
-    page = 20
-    link = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=102")
-    @cnf_url << {links: link}
-    begin
-      links = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=102&page=#{i}")
-      i +=1
-      @cnf_url << {links: links}
-    end until i > page
-    @cnf_url.each do |key, value|
-      url = key[:links].to_s
-      page = Nokogiri::HTML(open("#{url}"))
-      company = page.css('#main-wrapper .title').text
-      address = page.css('#r1+ td').text
-      city = page.css('#r2+ td').text
-      country = page.css('#r3+ td').text
-      telephone = page.css('#r4+ td').text
-      fax = page.css('#r5+ td').text
-      puts address "#{'\n'}"
-    end
-  end
 
-  def self.test
+  def self.test_4
     agent_ids = []
     license_nos = []
     names = []
@@ -94,7 +71,7 @@ class Scrap
         license_no = row.css('td')[1].text
         name = row.css('td')[2].text
         address = row.css('td')[3].text
-        row.search('br').each {|n| n.replace("#")}
+        row.search('br').each { |n| n.replace("#") }
         contact_block = row.css('td')[4].text
         telephone = contact_block.split('#')[0].gsub('Telephone: ', '').strip rescue nil
         cell_no = contact_block.split('#')[1].gsub('Cell No.: ', '').strip rescue nil
@@ -118,37 +95,13 @@ class Scrap
     end
   end
 
-  def self.test_2
+  def self.test_6
     page = Nokogiri::HTML(open("http://chc.gov.bd/imp/cnf_agents.php"))
     agents_identification_number = page.css('#inner_page_full_desc td:nth-child(2)').text
     puts agents_identification_number
   end
 
-  def self.cnf
-    @cnf_url = []
-    i=2
-    page = 20
-    link = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=102")
-    @cnf_url << {links: link}
-    begin
-      links = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=102&page=#{i}")
-      i +=1
-      @cnf_url << {links: links}
-    end until i > page
-    @cnf_url.each do |key, value|
-      url = key[:links].to_s
-      page = Nokogiri::HTML(open("#{url}"))
-      company = page.css('#main-wrapper .title').text
-      address = page.css('#r1+ td').text
-      city = page.css('#r2+ td').text
-      country = page.css('#r3+ td').text
-      telephone = page.css('#r4+ td').text
-      fax = page.css('#r5+ td').text
-      description = page.css('#r6+ td').text
-    end
-  end
-
-  def self.exporter_importer
+  def self.exporter_importer_2
     @exporter_url = []
     i=2
     page = 97
@@ -216,6 +169,7 @@ class Scrap
     agents_identification_number = page.css("tr:nth-child(2) td:nth-child(5)").text
     puts agents_identification_number
   end
+
   def self.test_3
     agent_ids = []
     license_nos = []
@@ -257,5 +211,110 @@ class Scrap
     end
   end
 
+  def self.cnf
+    @cnf_url = []
+    companies = []
+    addresses = []
+    cities = []
+    countries = []
+    telephones = []
+    faxs = []
+    descriptions = []
+    i=2
+    page = 20
+    link = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=102")
+    @cnf_url << {links: link}
+    begin
+      links = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=102&page=#{i}")
+      i +=1
+      @cnf_url << {links: links}
+    end until i > page
+    @cnf_url.each do |key, value|
+      url = key[:links].to_s
+      page = Nokogiri::HTML(open("#{url}"))
+      page.css("th:contains('Company')").each do |name|
+        company_name = name.parent.css("th")[1].text
+        companies << company_name
+      end
+      page.css("th:contains('Address')").each do |add|
+        address = add.parent.css("td").text
+        addresses << address
+      end
+      page.css("th:contains('City')").each do |city|
+        city = city.parent.css("td").text
+        cities << city
+      end
+      page.css("th:contains('Country')").each do |country|
+        country = country.parent.css("td").text
+        countries << country
+      end
+      page.css("th:contains('Telephone')").each do |telephone|
+        telephone = telephone.parent.css("td").text
+        telephones << telephone
+      end
+      page.css("th:contains('Fax')").each do |fax|
+        fax = fax.parent.css("td").text
+        faxs << fax
+      end
+      page.css("th:contains('Description')").each do |description|
+        description = description.parent.css("td").text
+        descriptions << description
+      end
+    end
+  end
+  def self.exporter_importer
+    @cnf_url = []
+    companies = []
+    addresses = []
+    cities = []
+    countries = []
+    telephones = []
+    faxs = []
+    descriptions = []
+    i=2
+    page = 97
+    link = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=107")
+    @cnf_url << {links: link}
+    begin
+      links = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=107&page=#{i}")
+      i +=1
+      @cnf_url << {links: links}
+    end until i > page
+    @cnf_url.each do |key, value|
+      url = key[:links].to_s
+      page = Nokogiri::HTML(open("#{url}"))
+      page.css("th:contains('Company')").each do |name|
+        company_name = name.parent.css("th")[1].text
+        companies << company_name
+      end
+      page.css("th:contains('Address')").each do |add|
+        address = add.parent.css("td").text
+        addresses << address
+      end
+      page.css("th:contains('City')").each do |city|
+        city = city.parent.css("td").text
+        cities << city
+      end
+      page.css("th:contains('Country')").each do |country|
+        country = country.parent.css("td").text
+        countries << country
+      end
+      page.css("th:contains('Telephone')").each do |telephone|
+        telephone = telephone.parent.css("td").text
+        telephones << telephone
+      end
+      page.css("th:contains('Fax')").each do |fax|
+        fax = fax.parent.css("td").text
+        faxs << fax
+      end
+      page.css("th:contains('Description')").each do |description|
+        description = description.parent.css("td").text
+        descriptions << description
+      end
+    end
+    companies.each do |c|
+      puts c
+    end
+  end
 end
 
