@@ -53,7 +53,6 @@ class Scrap
   end
 
 
-
   def self.test_4
     agent_ids = []
     license_nos = []
@@ -262,6 +261,7 @@ class Scrap
       end
     end
   end
+
   def self.exporter_importer
     @cnf_url = []
     companies = []
@@ -312,9 +312,13 @@ class Scrap
         descriptions << description
       end
     end
-    companies.each do |c|
-      puts c
-    end
+    puts companies.count
+    puts addresses.count
+    puts cities.count
+    puts countries.count
+    puts telephones.count
+    puts faxs.count
+    puts descriptions.count
   end
 end
 
