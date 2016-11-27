@@ -249,5 +249,13 @@ class Scrap
     end
   end
 
+  def self.address_bazar
+    page = Nokogiri::HTML(open("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=102"))
+    page.css("th:contains('Company')").each do |name|
+      company_name = name.parent.css("th")[1].text
+      puts company_name
+    end
+  end
+
 end
 
