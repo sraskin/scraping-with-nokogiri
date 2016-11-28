@@ -260,10 +260,16 @@ class Scrap
         descriptions << description
       end
     end
+    c=0
+    begin
+      agent = Agent.new(name: companies[c], address: addresses[c], phone: telephones[c], fax: faxs[c], city: cities[c], country: countries[c], description: descriptions[c])
+      agent.save
+      c +=1
+    end until c > companies.count
   end
 
   def self.exporter_importer
-    @cnf_url = []
+    cnf_url = []
     companies = []
     addresses = []
     cities = []
@@ -274,13 +280,13 @@ class Scrap
     i=2
     page = 97
     link = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=107")
-    @cnf_url << {links: link}
+    cnf_url << {links: link}
     begin
       links = ("http://www.addressbazar.com/Article_Title_Body.php?Sub_Category_ID=107&page=#{i}")
       i +=1
-      @cnf_url << {links: links}
+      cnf_url << {links: links}
     end until i > page
-    @cnf_url.each do |key, value|
+    cnf_url.each do |key, value|
       url = key[:links].to_s
       page = Nokogiri::HTML(open("#{url}"))
       page.css("th:contains('Company')").each do |name|
@@ -312,13 +318,16 @@ class Scrap
         descriptions << description
       end
     end
-    puts companies.count
-    puts addresses.count
-    puts cities.count
-    puts countries.count
-    puts telephones.count
-    puts faxs.count
-    puts descriptions.count
+
+    c=0
+    begin
+      agent = Agent.new(name: companies[c], address: addresses[c], phone: telephones[c], fax: faxs[c], city: cities[c], country: countries[c], description: descriptions[c])
+      begin
+        agent.save
+      rescue
+      end
+      c +=1
+    end until c > companies.count
   end
 end
 
