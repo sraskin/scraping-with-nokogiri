@@ -329,5 +329,25 @@ class Scrap
       c +=1
     end until c > companies.count
   end
+
+  def self.bsba
+    page = Nokogiri::HTML(open('http://www.bsba.org.bd/page.php?id=5'))
+    table = page.css('table tbody tr')
+    table.each do |row|
+      com = row.css('td')[1]
+      company = com.css('p')[0].text
+      address = com.css('p')[1]
+
+      own = row.css('td')[2]
+      owner_name = own.css('p')[0].text
+      owner_number = own.css('p')[1]
+
+      com_cont = row.css('td')[3]
+      off = com_cont.css('p')[0].text
+      res = com_cont.css('p')[1]
+      yard = com_cont.css('p')[2]
+      fax = com_cont.css('p')[3]
+    end
+  end
 end
 
