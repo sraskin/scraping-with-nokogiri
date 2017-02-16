@@ -365,12 +365,11 @@ class Scrap
   def self.bttlmea
     page = Nokogiri::HTML(open('http://www.bttlmea.com.bd/member_profile.php'))
     cat_urls = []
-
+    company_detils_urls = []
     page.css('#content a').each do |a|
       category_url = a['href']
       cat_urls << "http://www.bttlmea.com.bd/#{category_url}"
     end
-    company_names = []
     cat_urls.each do |cat|
       cat_page = Nokogiri::HTML(open("#{cat}"))
       table = cat_page.css('table')[2]
@@ -379,15 +378,61 @@ class Scrap
         unless index == 0
           company_name = t.css('td')[1].text
           company_location = t.css('td')[2].text
-          company_details_url = t.css('td')[3]
-          div = company_details_url.css('div')
-          a = div.css('a')[0]['href']
-          binding.pry
-          puts a
+          begin
+            company_details_url = t.css('td')[3]
+            div = company_details_url.css('div')
+            a = div.css('a')[0]['href']
+            company_detils_urls << "http://www.bttlmea.com.bd/#{a}"
+          rescue
+          end
         end
       end
     end
+    company_detils_urls.each do |cu|
+      page = Nokogiri::HTML(open("#{cu}"))
+      table = page.css('td table')
+      company_name = table.css('tr div')[1].text
+      membership_no = table.css('tr:nth-child(3) td:nth-child(4)').text
+      year_of_membership = table.css('tr:nth-child(4) td~ td+ td').text
+      name = table.css('tr:nth-child(6) td:nth-child(4)').text
+      position = table.css('tr:nth-child(7) td~ td+ td').text
+      mobile = table.css('tr:nth-child(8) td~ td+ td').text
+      email = table.css('tr:nth-child(9) td~ td+ td').text
+      office_address = table.css('tr:nth-child(11) td:nth-child(4)').text
+      office_phone = table.css('tr:nth-child(12) td~ td+ td').text
+      office_fax = table.css('tr:nth-child(13) td~ td+ td').text
+      office_email = table.css('tr:nth-child(14) td~ td+ td').text
+      website = table.css('tr:nth-child(15) td~ td+ td').text
+      factory_category = table.css('tr:nth-child(17) td:nth-child(4)').text
+      factory_address = table.css('tr:nth-child(18) td~ td+ td').text
+      factory_phone = table.css('tr:nth-child(19) td~ td+ td').text
+      factory_fax = table.css('tr:nth-child(20) td~ td+ td').text
+      no_of_looms = table.css('tr:nth-child(23) td:nth-child(4)').text
+      loom_type = table.css('tr:nth-child(24) td~ td+ td').text
+      loom_model = table.css('tr:nth-child(25) td~ td+ td').text
+      production_capacity = table.css('tr:nth-child(26) td~ td+ td').text
+      export_capacity = table.css('tr:nth-child(27) td~ td+ td').text
+      product_spec = table.css('tr:nth-child(28) td~ td+ td').text
+      no_employees = table.css('tr:nth-child(29) td~ td+ td').text
+      yearly_turnover = table.css('tr:nth-child(30) td~ td+ td').text
+      # puts "#{company_name}\n#{membership_no}\n#{year_of_membership}\n#{name}\n#{position}\n#{mobile}\n#{email}\n
+      #       #{office_address}\n#{office_phone}\n#{office_fax}\n#{office_email}\n#{website}\n#{factory_category}\n
+      #       #{factory_address}\n#{factory_phone}\n#{factory_fax}\n#{no_of_looms}\n#{loom_type}\n#{loom_model}\n
+      #       #{production_capacity}\n#{export_capacity}\n#{product_spec}\n#{no_employees}\n#{yearly_turnover}\n"
+
+    end
   end
+
+
+  def self.test
+    page = Nokogiri::HTML(open('http://www.bttlmea.com.bd/acs_textile.php'))
+    table = page.css('td table')
+    company_name = table.css('tr div')[1].text
+    membership_no = table.css('tr:nth-child(3) td:nth-child(4)').text
+    year_of_membership = table.css('tr:nth-child(4) td~ td+ td').text
+    name = table.css('tr:nth-child(6) td:nth-child(4)').text
+  end
+
 end
 
 
