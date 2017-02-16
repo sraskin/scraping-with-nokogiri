@@ -349,5 +349,45 @@ class Scrap
       fax = com_cont.css('p')[3]
     end
   end
+
+  def self.tannersbd
+    page = Nokogiri::HTML(open('http://www.tannersbd.com/?page_id=759'))
+    table = page.css('.entry-content')
+    table.each do |row|
+      company = row.css('h6').text
+      name = row.css('h6+ p').text
+      address = row.css('tr+ tr td:nth-child(3)').text
+      member_no = row.css('tr+ tr td:nth-child(4)').text
+      product = row.css('tr+ tr td:nth-child(5)').text
+    end
+  end
+
+  def self.bttlmea
+    page = Nokogiri::HTML(open('http://www.bttlmea.com.bd/member_profile.php'))
+    cat_urls = []
+
+    page.css('#content a').each do |a|
+      category_url = a['href']
+      cat_urls << "http://www.bttlmea.com.bd/#{category_url}"
+    end
+    company_names = []
+    cat_urls.each do |cat|
+      cat_page = Nokogiri::HTML(open("#{cat}"))
+      table = cat_page.css('table')[2]
+      tr = table.css('tr')
+      tr.each_with_index do |t, index|
+        unless index == 0
+          company_name = t.css('td')[1].text
+          company_location = t.css('td')[2].text
+          company_details_url = t.css('td')[3]
+          div = company_details_url.css('div')
+          a = div.css('a')[0]['href']
+          binding.pry
+          puts a
+        end
+      end
+    end
+  end
 end
+
 
