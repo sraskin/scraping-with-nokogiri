@@ -460,26 +460,6 @@ class Scrap
 
   def self.test
     page = Nokogiri::HTML(open('https://www.haab-bd.com/index.php?option=com_agency&Itemid=26&lang=en'))
-    table = page.css('div#inner_content table table tr')
-    content = table.css('tr') #load individual agent div
-    f=0
-    begin
-      first = content.css('tr')[0]
-      table = first.css('td')[1]
-      image = first.css('img')[0]['src']
-      hajj_licence = table.css('td')[2].text
-      agencey_name = table.css('td')[5].text
-      owner_name = table.css('td')[8].text
-      designation = table.css('td')[11].text
-      address = table.css('td')[14].text
-      phone = table.css('td')[17].text
-      mobile = table.css('td')[20].text
-      fax = table.css('td')[23].text
-      email = table.css('td')[26].text
-      website = table.css('td')[29].text
-      puts "#{image},#{hajj_licence}\n#{agencey_name}\n#{owner_name}\n#{designation}\n#{address}\n#{phone}\n#{mobile}\n#{fax}\n#{email}\n#{website}\n"
-      f +=11
-    end until f > 231
   end
 end
 
