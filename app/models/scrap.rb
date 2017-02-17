@@ -415,24 +415,72 @@ class Scrap
       product_spec = table.css('tr:nth-child(28) td~ td+ td').text
       no_employees = table.css('tr:nth-child(29) td~ td+ td').text
       yearly_turnover = table.css('tr:nth-child(30) td~ td+ td').text
-      # puts "#{company_name}\n#{membership_no}\n#{year_of_membership}\n#{name}\n#{position}\n#{mobile}\n#{email}\n
-      #       #{office_address}\n#{office_phone}\n#{office_fax}\n#{office_email}\n#{website}\n#{factory_category}\n
-      #       #{factory_address}\n#{factory_phone}\n#{factory_fax}\n#{no_of_looms}\n#{loom_type}\n#{loom_model}\n
-      #       #{production_capacity}\n#{export_capacity}\n#{product_spec}\n#{no_employees}\n#{yearly_turnover}\n"
+      puts "_____________________________________________________________________________________________________\n"
+      puts "#{company_name}\n#{membership_no}\n#{year_of_membership}\n#{name}\n#{position}\n#{mobile}\n#{email}\n
+           #{office_address}\n#{office_phone}\n#{office_fax}\n#{office_email}\n#{website}\n#{factory_category}\n
+           #{factory_address}\n#{factory_phone}\n#{factory_fax}\n#{no_of_looms}\n#{loom_type}\n#{loom_model}\n
+           #{production_capacity}\n#{export_capacity}\n#{product_spec}\n#{no_employees}\n#{yearly_turnover}\n"
+      puts "_____________________________________________________________________________________________________\n"
+    end
+  end
 
+  def self.haab
+    urls = []
+    urls << "https://www.haab-bd.com/index.php?option=com_agency&Itemid=26&lang=en"
+    u=20
+    begin
+      urls << "https://www.haab-bd.com/index.php?option=com_agency&Itemid=26&lang=en&limitstart=#{u}"
+      u +=20
+    end until u > 1240
+    urls.each do |u|
+      page = Nokogiri::HTML(open("#{u}"))
+      table = page.css('div#inner_content table table tr')
+      content = table.css('tr') #load individual agent div
+      f=0
+      begin
+        first = content.css('tr')[0]
+        table = first.css('td')[1]
+        image = first.css('img')[0]['src']
+        hajj_licence = table.css('td')[2].text
+        agencey_name = table.css('td')[5].text
+        owner_name = table.css('td')[8].text
+        designation = table.css('td')[11].text
+        address = table.css('td')[14].text
+        phone = table.css('td')[17].text
+        mobile = table.css('td')[20].text
+        fax = table.css('td')[23].text
+        email = table.css('td')[26].text
+        website = table.css('td')[29].text
+        puts "#{image},#{hajj_licence}\n#{agencey_name}\n#{owner_name}\n#{designation}\n#{address}\n#{phone}\n#{mobile}\n#{fax}\n#{email}\n#{website}\n"
+        f +=11
+      end until f > 231
     end
   end
 
 
   def self.test
-    page = Nokogiri::HTML(open('http://www.bttlmea.com.bd/acs_textile.php'))
-    table = page.css('td table')
-    company_name = table.css('tr div')[1].text
-    membership_no = table.css('tr:nth-child(3) td:nth-child(4)').text
-    year_of_membership = table.css('tr:nth-child(4) td~ td+ td').text
-    name = table.css('tr:nth-child(6) td:nth-child(4)').text
+    page = Nokogiri::HTML(open('https://www.haab-bd.com/index.php?option=com_agency&Itemid=26&lang=en'))
+    table = page.css('div#inner_content table table tr')
+    content = table.css('tr') #load individual agent div
+    f=0
+    begin
+      first = content.css('tr')[0]
+      table = first.css('td')[1]
+      image = first.css('img')[0]['src']
+      hajj_licence = table.css('td')[2].text
+      agencey_name = table.css('td')[5].text
+      owner_name = table.css('td')[8].text
+      designation = table.css('td')[11].text
+      address = table.css('td')[14].text
+      phone = table.css('td')[17].text
+      mobile = table.css('td')[20].text
+      fax = table.css('td')[23].text
+      email = table.css('td')[26].text
+      website = table.css('td')[29].text
+      puts "#{image},#{hajj_licence}\n#{agencey_name}\n#{owner_name}\n#{designation}\n#{address}\n#{phone}\n#{mobile}\n#{fax}\n#{email}\n#{website}\n"
+      f +=11
+    end until f > 231
   end
-
 end
 
 
