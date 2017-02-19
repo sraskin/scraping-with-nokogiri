@@ -415,12 +415,12 @@ class Scrap
       product_spec = table.css('tr:nth-child(28) td~ td+ td').text
       no_employees = table.css('tr:nth-child(29) td~ td+ td').text
       yearly_turnover = table.css('tr:nth-child(30) td~ td+ td').text
-      puts "_____________________________________________________________________________________________________\n"
-      puts "#{company_name}\n#{membership_no}\n#{year_of_membership}\n#{name}\n#{position}\n#{mobile}\n#{email}\n
-           #{office_address}\n#{office_phone}\n#{office_fax}\n#{office_email}\n#{website}\n#{factory_category}\n
-           #{factory_address}\n#{factory_phone}\n#{factory_fax}\n#{no_of_looms}\n#{loom_type}\n#{loom_model}\n
-           #{production_capacity}\n#{export_capacity}\n#{product_spec}\n#{no_employees}\n#{yearly_turnover}\n"
-      puts "_____________________________________________________________________________________________________\n"
+      # puts "_____________________________________________________________________________________________________\n"
+      # puts "#{company_name}\n#{membership_no}\n#{year_of_membership}\n#{name}\n#{position}\n#{mobile}\n#{email}\n
+      #      #{office_address}\n#{office_phone}\n#{office_fax}\n#{office_email}\n#{website}\n#{factory_category}\n
+      #      #{factory_address}\n#{factory_phone}\n#{factory_fax}\n#{no_of_looms}\n#{loom_type}\n#{loom_model}\n
+      #      #{production_capacity}\n#{export_capacity}\n#{product_spec}\n#{no_employees}\n#{yearly_turnover}\n"
+      # puts "_____________________________________________________________________________________________________\n"
     end
   end
 
@@ -438,7 +438,7 @@ class Scrap
       content = table.css('tr') #load individual agent div
       f=0
       begin
-        first = content.css('tr')[0]
+        first = content.css('tr')[f]
         table = first.css('td')[1]
         image = first.css('img')[0]['src']
         hajj_licence = table.css('td')[2].text
@@ -451,16 +451,66 @@ class Scrap
         fax = table.css('td')[23].text
         email = table.css('td')[26].text
         website = table.css('td')[29].text
-        puts "#{image},#{hajj_licence}\n#{agencey_name}\n#{owner_name}\n#{designation}\n#{address}\n#{phone}\n#{mobile}\n#{fax}\n#{email}\n#{website}\n"
+        # puts "#{image},#{hajj_licence}\n#{agencey_name}\n#{owner_name}\n#{designation}\n#{address}\n#{phone}\n#{mobile}\n#{fax}\n#{email}\n#{website}\n"
         f +=11
       end until f > 231
     end
   end
 
+  def self.rehab
+    urls = []
+    details_urls = []
+    u=1
+    begin
+      urls << "http://www.rehab-bd.org/index.php?page=members&page2=#{u}&action=Add&NumRec=&asearch="
+      u +=1
+    end until u > 135
+    urls.each do |u|
+      page = Nokogiri::HTML(open("#{u}"))
+      url_wrapper = page.css('#table_in_file table table table table table p')
+      url_wrapper.each do |url|
+        u = url.css('a')[0]['href']
+        details_urls << "http://www.rehab-bd.org/#{u}"
+      end
+    end
+    details_urls.each do |du|
+      page = Nokogiri::HTML(open("#{du}"))
+      company_name = page.css('#table_in_file span').text.strip
+      type_of_company = page.css('tr:nth-child(4) td~ td+ td').text.strip
+      membership_no = page.css('tr:nth-child(5) td~ td+ td').text.strip
+      incorporation_date = page.css('tr:nth-child(6) td~ td+ td').text.strip
+      name = page.css('tr:nth-child(9) td~ td+ td').text.strip
+      designation = page.css('tr:nth-child(10) td~ td+ td').text.strip
+      business_address = page.css('tr:nth-child(11) td~ td+ td').text.strip
+      phone = page.css('tr:nth-child(12) td~ td+ td').text.strip
+      fax = page.css('tr:nth-child(13) td~ td+ td').text.strip
+      mobile = page.css('tr:nth-child(14) td~ td+ td').text.strip
+      email = page.css('tr:nth-child(15) td~ td+ td').text.strip
+      web = page.css('tr:nth-child(16) td~ td+ td').text.strip
+      puts "#{company_name}\n#{type_of_company}\n#{membership_no}\n#{incorporation_date}\n#{name}\n#{designation}\n
+           #{business_address}\n#{phone}\n#{fax}\n#{mobile}\n#{email}\n#{web}\n"
+    end
+  end
 
   def self.test
-    page = Nokogiri::HTML(open('https://www.haab-bd.com/index.php?option=com_agency&Itemid=26&lang=en'))
+    page = Nokogiri::HTML(open('http://www.toab.org/memberList.php?tid=2'))
+    table = page.css('td table')
+    urls = []
+
+      tr = table.css('tr')
+    tr.each do |t|
+      first_td = t.css('td')[0]
+      first_url = first_td.css('a')[0]['href']
+      urls << "http://www.toab.org/#{first_url}"
+      second_td = t.css('td')[1]
+      secind_url = second_td.css('a')[0]['href']
+      urls << "http://www.toab.org/#{first_url}"
+    end
+
+
+    puts urls
   end
+
 end
 
 
