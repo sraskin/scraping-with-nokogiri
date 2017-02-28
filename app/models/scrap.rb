@@ -332,33 +332,51 @@ class Scrap
 
   def self.bsba
     page = Nokogiri::HTML(open('http://www.bsba.org.bd/page.php?id=5'))
-    table = page.css('table tbody tr')
-    table.each do |row|
-      com = row.css('td')[1]
-      company = com.css('p')[0].text
-      address = com.css('p')[1]
+    table = page.css('div.wrapper table tbody')
+    t=1
+    begin
+      tr = table.css('tr')[t]
 
-      own = row.css('td')[2]
-      owner_name = own.css('p')[0].text
-      owner_number = own.css('p')[1]
-
-      com_cont = row.css('td')[3]
-      off = com_cont.css('p')[0].text
-      res = com_cont.css('p')[1]
-      yard = com_cont.css('p')[2]
-      fax = com_cont.css('p')[3]
-    end
+      com_td = tr.css('td')[1]
+      name_td = tr.css('td')[2]
+      tel_td = tr.css('td')[3]
+      company = com_td.css('p')[0].text.strip
+      address = com_td.css('p')[1].text.strip
+      name = name_td.css('p')[0].text.strip
+      begin
+        mobile = name_td.css('p')[1].text.strip
+      rescue
+        puts "Error"
+      end
+      off = tel_td.css('p')[0].text.strip
+      res = tel_td.css('p')[1].text.strip
+      yard = tel_td.css('p')[2].text.strip
+      fax = tel_td.css('p')[3].text.strip
+      phone = "#{off}, #{res}, #{yard}, #{fax},"
+      puts mobile
+      puts phone
+      t +=1
+    end until t > 147
   end
 
   def self.tannersbd
     page = Nokogiri::HTML(open('http://www.tannersbd.com/?page_id=759'))
-    table = page.css('.entry-content')
-    table.each do |row|
-      company = row.css('h6').text
-      name = row.css('h6+ p').text
-      address = row.css('tr+ tr td:nth-child(3)').text
-      member_no = row.css('tr+ tr td:nth-child(4)').text
-      product = row.css('tr+ tr td:nth-child(5)').text
+    body = page.css('.entry-content')
+    table = body.css('table tbody')
+    tr = table.css('tr')
+    tr.each_with_index do |t, index|
+      unless index == 0
+        td = t.css('td')
+        com = td.css('td')[1]
+        company = com.css('strong').text
+        name = com.css('p').text
+        address = td.css('td')[2].text
+        member_no = td.css('td')[3].text
+        product = td.css('td')[4].text
+        puts "-------------------------------------------------------"
+        puts "#{company}\n#{address}\n#{member_no}\n#{name}\n#{product}\n"
+        puts "-------------------------------------------------------"
+      end
     end
   end
 
@@ -481,7 +499,7 @@ class Scrap
       incorporation_date = page.css('tr:nth-child(6) td~ td+ td').text.strip
       name = page.css('tr:nth-child(9) td~ td+ td').text.strip
       designation = page.css('tr:nth-child(10) td~ td+ td').text.strip
-      business_address = page.css('tr:nth-child(11) td~ td+ td').text.strip
+      business_address = page.css('tr:nth-child(11) td~ td+ td').text
       phone = page.css('tr:nth-child(12) td~ td+ td').text.strip
       fax = page.css('tr:nth-child(13) td~ td+ td').text.strip
       mobile = page.css('tr:nth-child(14) td~ td+ td').text.strip
@@ -492,23 +510,122 @@ class Scrap
     end
   end
 
-  def self.test
-    page = Nokogiri::HTML(open('http://www.toab.org/memberList.php?tid=2'))
-    table = page.css('td table')
+  def self.toab
     urls = []
+    u=1
+    begin
+      urls << "http://www.toab.org/detail_member.php?idn=#{u}"
+      u +=1
+    end until u > 317
+    page = Nokogiri::HTML(open('http://www.toab.org/detail_member.php?idn=1'))
+    wrapper = page.css('td table')
+    company = wrapper.css('.body_text_dark_blue strong').text
+    tr = wrapper.css('tr+ tr .body_text_dark_blue').text
+    a = tr.split("\r")
+    name = a.slice!(0)
+    address = a.join('').strip
+    phone = wrapper.css('tr:nth-child(3) td').text.strip
+    mobile = wrapper.css('tr:nth-child(4) td').text.strip
+    email = wrapper.css('tr:nth-child(5) td').text.strip
+    website = wrapper.css('tr:nth-child(6) td').text.strip
+  end
 
-      tr = table.css('tr')
-    tr.each do |t|
-      first_td = t.css('td')[0]
-      first_url = first_td.css('a')[0]['href']
-      urls << "http://www.toab.org/#{first_url}"
-      second_td = t.css('td')[1]
-      secind_url = second_td.css('a')[0]['href']
-      urls << "http://www.toab.org/#{first_url}"
+  def self.bmss
+    urls = []
+    u=1
+    begin
+      urls << "http://www.bmss-bd.org/member-directory.php?CurLst=#{u}&"
+      u +=1
+    end until u > 37
+    urls.each do |u|
+      page = Nokogiri::HTML(open("#{u}"))
+      wrapper = page.css('div.about-content div.paragraph-row')
+      f_div = wrapper.css('.paragraph-row')
+      f_div.each do |f|
+        s_div = f.css('.column16')
+        s_div.each do |s|
+          t_div = s.css('.bmss-member')
+          f_div = t_div.css('div')[2]
+          company = f_div.css('h3').text
+          n = f_div.css('p')[0].text.gsub('Name:', '')
+          name = n.gsub(':', '').strip
+          a = f_div.css('p')[1].text.gsub('Address', '')
+          address = a.gsub(':', '').strip
+          p = f_div.css('p')[2].text.gsub('Contact', '')
+          phone = p.gsub(':', '').strip
+          e = f_div.css('p')[3].text.gsub('Email', '')
+          email = e.gsub(':', '').strip
+          m = f_div.css('p')[4].text.gsub('Membership Number', '')
+          membership = m.gsub(':', '').strip
+          puts company
+        end
+      end
     end
+  end
 
+  def self.bkmea
+    urls = []
+    details_urls = []
 
-    puts urls
+    urls << "http://www.bkmea.com/member/index.php?Index=all"
+    u=2
+    begin
+      urls << "http://www.bkmea.com/member/index.php?Index=all&page=#{u}"
+      u +=1
+    end until u > 94
+
+    urls.each do |u|
+      page = Nokogiri::HTML(open("#{u}"))
+      wrapper = page.css('table table')
+      body = wrapper.css('tr')[6]
+      table = body.css('table tr')
+      table.each_with_index do |t, index|
+        unless index == 0
+          td = t.css('td')[0]
+          url = td.css('a')[0]['href'].gsub('./','http://www.bkmea.com/member/')
+          details_urls << url
+          puts url
+        end
+      end
+    end
+    details_urls.each do |d|
+      page = Nokogiri::HTML(open("#{d}"))
+      table = page.css('table table')
+      membership = table.css('#option+ #tbl .normal:nth-child(3) td+ td').text
+      membership_type = table.css('#option+ #tbl .normal:nth-child(4) td+ td').text
+      year_of_reg = table.css('#option+ #tbl .normal:nth-child(5) td+ td').text
+      no_of_worker = table.css('tr:nth-child(4) .normal:nth-child(5) td+ td').text
+      address_factory = table.css('.value:nth-child(3)').text
+      address_office = table.css('.value:nth-child(10)').text
+      company = table.css('#option+ #tbl .normal:nth-child(2) td+ td').text
+      background_info = "Membership No:\n#{membership}\nMembership Type:\n#{membership_type}\nYear of Reg.:\n#{year_of_reg}\nNo of Worker:\n#{no_of_worker}"
+      name = table.css('tr:nth-child(3) .normal:nth-child(2) td+ td').text
+      mobile = table.css('tr:nth-child(3) .normal:nth-child(3) td+ td').text
+      role = table.css('tr:nth-child(3) .normal:nth-child(4) td+ td').text
+      address = "Factory: \n#{address_factory}\nOffice: #{address_office}"
+      phone = table.css('.value:nth-child(5)').text
+      email = table.css('.value:nth-child(16)').text
+    end
+  end
+
+  def self.test
+    page = Nokogiri::HTML(open('http://www.bkmea.com/member/member_details.php?BackView&Page=1&Index=all&MID=1683'))
+    table = page.css('table table')
+    membership = table.css('#option+ #tbl .normal:nth-child(3) td+ td').text
+    membership_type = table.css('#option+ #tbl .normal:nth-child(4) td+ td').text
+    year_of_reg = table.css('#option+ #tbl .normal:nth-child(5) td+ td').text
+    no_of_worker = table.css('tr:nth-child(4) .normal:nth-child(5) td+ td').text
+    address_factory = table.css('.value:nth-child(3)').text
+    address_office = table.css('.value:nth-child(10)').text
+    company = table.css('#option+ #tbl .normal:nth-child(2) td+ td').text
+    background_info = "Membership No:\n#{membership}\nMembership Type:\n#{membership_type}\nYear of Reg.:\n#{year_of_reg}\nNo of Worker:\n#{no_of_worker}"
+    name = table.css('tr:nth-child(3) .normal:nth-child(2) td+ td').text
+    mobile = table.css('tr:nth-child(3) .normal:nth-child(3) td+ td').text
+    role = table.css('tr:nth-child(3) .normal:nth-child(4) td+ td').text
+    address = "Factory: \n#{address_factory}\nOffice: #{address_office}"
+    phone = table.css('.value:nth-child(5)').text
+    email = table.css('.value:nth-child(16)').text
+    puts "#{company}\n#{background_info}\n#{name}\n#{mobile}\n#{role}\n#{address}\n#{phone}\n#{email}\n"
   end
 
 end
