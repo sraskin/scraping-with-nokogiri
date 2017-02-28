@@ -582,7 +582,7 @@ class Scrap
       table.each_with_index do |t, index|
         unless index == 0
           td = t.css('td')[0]
-          url = td.css('a')[0]['href'].gsub('./','http://www.bkmea.com/member/')
+          url = td.css('a')[0]['href'].gsub('./', 'http://www.bkmea.com/member/')
           details_urls << url
           puts url
         end
@@ -608,24 +608,97 @@ class Scrap
     end
   end
 
-  def self.test
-    page = Nokogiri::HTML(open('http://www.bkmea.com/member/member_details.php?BackView&Page=1&Index=all&MID=1683'))
-    table = page.css('table table')
-    membership = table.css('#option+ #tbl .normal:nth-child(3) td+ td').text
-    membership_type = table.css('#option+ #tbl .normal:nth-child(4) td+ td').text
-    year_of_reg = table.css('#option+ #tbl .normal:nth-child(5) td+ td').text
-    no_of_worker = table.css('tr:nth-child(4) .normal:nth-child(5) td+ td').text
-    address_factory = table.css('.value:nth-child(3)').text
-    address_office = table.css('.value:nth-child(10)').text
-    company = table.css('#option+ #tbl .normal:nth-child(2) td+ td').text
-    background_info = "Membership No:\n#{membership}\nMembership Type:\n#{membership_type}\nYear of Reg.:\n#{year_of_reg}\nNo of Worker:\n#{no_of_worker}"
-    name = table.css('tr:nth-child(3) .normal:nth-child(2) td+ td').text
-    mobile = table.css('tr:nth-child(3) .normal:nth-child(3) td+ td').text
-    role = table.css('tr:nth-child(3) .normal:nth-child(4) td+ td').text
-    address = "Factory: \n#{address_factory}\nOffice: #{address_office}"
-    phone = table.css('.value:nth-child(5)').text
-    email = table.css('.value:nth-child(16)').text
-    puts "#{company}\n#{background_info}\n#{name}\n#{mobile}\n#{role}\n#{address}\n#{phone}\n#{email}\n"
+  def self.baffa
+    urls = []
+    urls << "http://www.baffa-bd.org/members.php"
+    u=2
+    begin
+      urls << "http://www.baffa-bd.org/members.php?page=#{u}"
+      u +=1
+    end until u > 96
+    urls.each do |u|
+      page = Nokogiri::HTML(open("#{u}"))
+      wrapper = page.css('table table table table')
+      table = wrapper.css('td table') #iterate1
+      table.each do |t|
+        com_tr = t.css('tr')[0]
+        add_tr = t.css('tr')[1]
+        call_tr = t.css('tr')[2]
+        web_tr = t.css('tr')[4]
+        name_td = t.css('tr')[5]
+        role_td = t.css('tr')[6]
+        company = com_tr.css('td')[0].text
+        member = com_tr.css('td')[1].text
+        address = add_tr.css('td')[0].text
+        phone = call_tr.css('td')[0].text.gsub('Tel:', '').strip
+        mobile = call_tr.css('td')[1].text.gsub('Cell:', '').strip
+        email = web_tr.css('td')[0].text.gsub('Email:', '').strip
+        website = web_tr.css('td')[1].text.gsub('Web:', '').strip
+        name = name_td.css('td')[0].text.gsub('PTC:', '').strip
+        role = role_td.css('td')[0].text
+        puts company
+      end
+    end
+  end
+
+  def self.basis
+    urls = []
+    details_urls = []
+    urls << "http://www.basis.org.bd/index.php/members_area/member_list"
+    u=20
+    begin
+      urls << "http://www.basis.org.bd/index.php/members_area/member_list/#{u}"
+      u +=20
+    end until u > 1040
+    urls.each do |u|
+      page = Nokogiri::HTML(open("#{u}"))
+      wrapper= page.css('.border+ td , b')
+      table = wrapper.css('td table')
+      table.each do |t|
+        tr = t.css('tr')[0]
+        url = tr.css('a')[0]['href']
+        details_urls << url
+        puts url
+      end
+    end
+    details_urls.each do |d|
+      page = Nokogiri::HTML(open("#{d}"))
+
+      membership = page.css('td td td td tr:nth-child(1) tr:nth-child(5) font').text
+      estiblished = page.css('td td td td tr:nth-child(1) tr:nth-child(6) font').text
+      other_site = page.css('td td td td tr:nth-child(1) tr:nth-child(6) font').text
+      email_o = page.css('td td td td td tr:nth-child(9) .bodytext+ .bodytext font').text
+      email_t = page.css('tr:nth-child(15) .bodytext+ .bodytext font').text
+      ph_two = page.css('tr:nth-child(14) .bodytext+ .bodytext font').text
+      ph_one = page.css('td td td td tr:nth-child(1) tr:nth-child(8) .bodytext+ .bodytext font').text
+
+      company = page.css('td td td td tr:nth-child(1) tr:nth-child(4) .bodytext+ .bodytext font').text
+      address = page.css('td td td td td tr:nth-child(7) .bodytext+ .bodytext font').text
+      phone = "#{ph_one}, #{ph_two}"
+      website = page.css('tr:nth-child(9) .bodytext+ .bodytext font').text
+      name = page.css('td td td td td tr:nth-child(13) .bodytext+ .bodytext font').text
+      role = page.css('tr:nth-child(13) .bodytext+ .bodytext font').text
+      email = "#{email_o}\n#{email_t}"
+      background_info = "#{membership}\n#{estiblished}\n#{other_site}"
+      puts "#{company}\n#{address}\n#{phone}\n#{email}\n#{name}\n#{role}"
+    end
+  end
+
+  def self.baira
+    page = Nokogiri::HTML(open('http://www.baira.org.bd/extra/withoutphoto.php'))
+    wrapper = page.css('table tr')
+    wrapper.each_with_index do |w, index|
+      unless index == 0
+        name = w.css('td')[1].text
+        role = w.css('td')[2].text
+        company = w.css('td')[3].text
+        reg_no = w.css('td')[4].text
+        address = w.css('td')[5].text
+        phone = w.css('td')[6].text.gsub('(Off.)', '').gsub('(Res.)', '').gsub('(Off)', '').gsub('Off.)', '').strip
+        mobile = w.css('td')[7].text
+        email = w.css('td')[9].text
+      end
+    end
   end
 
 end
