@@ -148,21 +148,6 @@ class Scrap
     end
   end
 
-  def self.test
-    page = Nokogiri::HTML(open("http://chc.gov.bd/imp/cnf_agents.php"))
-    i = 2
-    s = 14
-    id = []
-    begin
-      agents_identification_number = page.css("#inner_page_full_desc tr:nth-child(#{i}) td:nth-child(1)").text
-      i +=1
-      id << agents_identification_number
-    end until i > s
-    id.each do |ii|
-      puts ii
-    end
-  end
-
   def self.test_2
     page = Nokogiri::HTML(open("http://chc.gov.bd/imp/cnf_agents.php"))
     agents_identification_number = page.css("tr:nth-child(2) td:nth-child(5)").text
@@ -517,17 +502,15 @@ class Scrap
       urls << "http://www.toab.org/detail_member.php?idn=#{u}"
       u +=1
     end until u > 317
-    page = Nokogiri::HTML(open('http://www.toab.org/detail_member.php?idn=1'))
-    wrapper = page.css('td table')
-    company = wrapper.css('.body_text_dark_blue strong').text
-    tr = wrapper.css('tr+ tr .body_text_dark_blue').text
-    a = tr.split("\r")
-    name = a.slice!(0)
-    address = a.join('').strip
-    phone = wrapper.css('tr:nth-child(3) td').text.strip
-    mobile = wrapper.css('tr:nth-child(4) td').text.strip
-    email = wrapper.css('tr:nth-child(5) td').text.strip
-    website = wrapper.css('tr:nth-child(6) td').text.strip
+    urls.each do |u|
+      page = Nokogiri::HTML(open("#{u}"))
+      wrapper = page.css('td table')
+      phone = wrapper.css('td:contains("Tel :")').text.gsub('Tel :','').strip
+      mobile = wrapper.css('td:contains("Cell :")').text.gsub('Cell :','').strip
+      email = wrapper.css('td:contains("Email :")').text.gsub('Email :','').strip
+      website = wrapper.css('td:contains("Web :")').text.gsub('Web :','').strip
+
+    end
   end
 
   def self.bmss
@@ -547,15 +530,15 @@ class Scrap
           t_div = s.css('.bmss-member')
           f_div = t_div.css('div')[2]
           company = f_div.css('h3').text
-          n = f_div.css('p')[0].text.gsub('Name:', '')
+          n = f_div.css('p').text.gsub('Name:', '')
           name = n.gsub(':', '').strip
-          a = f_div.css('p')[1].text.gsub('Address', '')
+          a = f_div.css('p').text.gsub('Address', '')
           address = a.gsub(':', '').strip
-          p = f_div.css('p')[2].text.gsub('Contact', '')
+          p = f_div.css('p').text.gsub('Contact', '')
           phone = p.gsub(':', '').strip
-          e = f_div.css('p')[3].text.gsub('Email', '')
+          e = f_div.css('p').text.gsub('Email', '')
           email = e.gsub(':', '').strip
-          m = f_div.css('p')[4].text.gsub('Membership Number', '')
+          m = f_div.css('p').text.gsub('Membership Number', '')
           membership = m.gsub(':', '').strip
           puts company
         end
@@ -699,6 +682,44 @@ class Scrap
         email = w.css('td')[9].text
       end
     end
+  end
+
+  def self.baplc
+    page = Nokogiri::HTML(open('http://baplc.org/all_members.php'))
+    urls = []
+    wrapper = page.css('table tr')
+    wrapper.each_with_index do |w, index|
+      unless index == 1
+        td = w.css('td')[4]
+        if td.present?
+          a = td.css('a')[0][:href]
+          urls << "http://baplc.org/#{a}"
+        end
+      end
+    end
+    urls.each do |u|
+      page = Nokogiri::HTML(open("#{u}"))
+      company = page.css('.CSSTableGenerator div strong').text
+      address = page.css('tr:nth-child(3) td').text.gsub('Address:', '').strip
+      name = page.css('tr:nth-child(4) td').text.gsub('Contact Person:', '').strip
+      role = page.css('tr:nth-child(5) td').text.gsub('Position:', '').strip
+      phone = page.css('tr:nth-child(6) td').text.gsub('Phone:', '').strip
+      email = page.css('tr:nth-child(8) td').text.gsub('E-mail:', '').strip
+      website = page.css('tr:nth-child(9) td').text.gsub('Website:', '').strip
+      puts "#{company}\n#{address}\n#{name}\n#{role}\n#{phone}\n#{email}\n"
+    end
+  end
+
+  def self.test
+    page = Nokogiri::HTML(open('http://baplc.org/view_member.php?id=1'))
+    company = page.css('.CSSTableGenerator div strong').text
+    address = page.css('tr:nth-child(3) td').text.gsub('Address:', '').strip
+    name = page.css('tr:nth-child(4) td').text.gsub('Contact Person:', '').strip
+    role = page.css('tr:nth-child(5) td').text.gsub('Position:', '').strip
+    phone = page.css('tr:nth-child(6) td').text.gsub('Phone:', '').strip
+    email = page.css('tr:nth-child(8) td').text.gsub('E-mail:', '').strip
+    website = page.css('tr:nth-child(9) td').text.gsub('Website:', '').strip
+
   end
 
 end
